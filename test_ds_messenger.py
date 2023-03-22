@@ -14,8 +14,20 @@ from ds_messenger import extract_json, DirectMessage, DirectMessenger
 
 class TestDsmessenger(unittest.TestCase):
     """test ds_messenger"""
+    def test_connect(self):
+        """test connect()"""
+        ds_messenger = DirectMessenger(dsuserver="168.235.86.102",
+                                       username="nicaiwoshishei",
+                                       password="buxiangshuohua")
+        assert not ds_messenger.connect()
+
+        ds_messenger = DirectMessenger(dsuserver="168.235.86.102",
+                                       username="nicaiwoshishei",
+                                       password="buxiangshuo")
+        assert not ds_messenger.connect()
 
     def test_extract_json(self):
+        """test extract_json"""
         DataTuple = namedtuple('DataTuple',
                                ['type_status', 'token', 'messages'])
 
@@ -41,6 +53,69 @@ class TestDsmessenger(unittest.TestCase):
         msg_np2 = None
         assert msg_np2 == extract_json(json_msg)
 
+    def test_directmessage(self):
+        """test DirectMessage()"""
+        directmessage = DirectMessage()
+        recipient = 'nicaiwoshishei'
+        message = 'nihao'
+        time = '20230321'
+        directmessage.recipient = recipient
+        directmessage.message = message
+        directmessage.timestamp = time
+        assert directmessage.recipient == 'nicaiwoshishei'
+        assert directmessage.message == 'nihao'
+        assert directmessage.timestamp == '20230321'
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_send(self):
+        """test send()"""
+        ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
+                                       username="VC1",
+                                       password="VC")
+        ds_messenger.connect()
+        result = ds_messenger.send(message="this is juan",
+                                   recipient="nicaiwoshishei")
+        assert result
+
+        ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
+                                       username="VC1",
+                                       password="VC")
+        result = ds_messenger.send(message="this is juan",
+                                   recipient="nicaiwoshishei")
+        assert not result
+
+        ds_messenger = DirectMessenger(dsuserver="168.235.86.102",
+                                       username="VC1",
+                                       password="VC")
+        ds_messenger.connect()
+        result = ds_messenger.send(message="this is juan",
+                                   recipient="nicaiwoshishei")
+        assert not result
+
+    def test_retrieve_new(self):
+        """test retrieve_new()"""
+        ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
+                                       username="VC1",
+                                       password="VC")
+        ds_messenger.connect()
+        ds_messenger.send(message="this is juan",
+                          recipient="nicaiwoshishei")
+
+        ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
+                                       username="nicaiwoshishei",
+                                       password="buxiangshuohua")
+        ds_messenger.connect()
+        obj = ds_messenger.retrieve_new()
+        assert obj[0].message == 'this is juan'
+
+    def test_retrieve_all(self):
+        """test retrieve_all()"""
+        ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
+                                       username="nicaiwoshishei",
+                                       password="buxiangshuohua")
+        ds_messenger.connect()
+        obj = ds_messenger.retrieve_all()
+        assert obj[0].message == 'nihao'
+
+
+# if __name__ == "__main__":
+#     unittest.main()

@@ -8,8 +8,7 @@ test ds_protocol.py
 
 import unittest
 import json
-from collections import namedtuple
-from ds_protocol import extract_json
+from ds_protocol import extract_json, DataTuple
 
 
 class TestDsmessenger(unittest.TestCase):
@@ -17,9 +16,6 @@ class TestDsmessenger(unittest.TestCase):
 
     def test_extract_json(self):
         """test extract_json"""
-        DataTuple = namedtuple('DataTuple',
-                               ['type_status', 'token', 'messages'])
-
         json_msg = {"response": {"type": "ok",
                                  "message": "Direct message sent"}}
         msg_np1 = DataTuple(type_status=json_msg["response"]["type"], token='',
@@ -43,5 +39,5 @@ class TestDsmessenger(unittest.TestCase):
         assert msg_np2 == extract_json(json_msg)
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+    # unittest.main()

@@ -34,7 +34,8 @@ def extract_json(json_msg: str) -> DataTuple:
         if 'messages' in response.keys():
             messages = json_obj['response']['messages']
 
-        return DataTuple(type_status, token, messages)
+        return DataTuple(type_status=type_status,
+                         token=token, messages=messages)
 
     except json.JSONDecodeError:
         print("Json cannot be decoded.")
@@ -136,8 +137,6 @@ class DirectMessenger:
                 send_token.flush()
                 resp = recv_token.readline()
                 resp_np = extract_json(resp)
-
-                # print(resp)
 
                 if resp_np.type_status != 'ok':
                     return False

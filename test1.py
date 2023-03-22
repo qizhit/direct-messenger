@@ -8,10 +8,12 @@ ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
                                username="VC1",
                                password="VC")
 
-ds_messenger.connect()
-result = ds_messenger.send(message="this is juan",
-                           recipient="nicaiwoshishei")
+result = ds_messenger.connect()
 print(result)
 
-# ds_messenger2.retrieve_new()
-# ds_messenger2.retrieve_all()
+result2 = ds_messenger.send(message="this is juan",
+                            recipient=None)
+print(result2)
+
+# ds_messenger.retrieve_new()
+# ds_messenger.retrieve_all()
