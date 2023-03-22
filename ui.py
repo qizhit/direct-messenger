@@ -21,7 +21,7 @@ import sys
 
 from command import *
 from Profile import *
-from ds_client import *
+from ds_messenger import *
 
 
 def start(prompt):
@@ -42,7 +42,6 @@ def start(prompt):
         print("You can edit or print your profile and posts!\n"
               "   e - edit your profile or posts\n"
               "   p - print your profile or posts\n"
-              "   u - upload your profile or posts online\n"
               "If you don't want to continue to "
               "edit, print, or upload your profile and posts, "
               "you can enter 'back' or 'q'.\n"
@@ -53,7 +52,6 @@ def start(prompt):
               "your profile and posts?\n"
               "   enter 'e' to edit\n"
               "   enter 'p' to print\n"
-              "   enter 'u' to upload\n"
               "If you don't want to continue to you can enter 'back' or 'q'.\n"
               "   enter 'back' to return\n"
               "   enter 'q' to exit the program\n")
@@ -272,65 +270,3 @@ def user_p(profile, path):
 
     print("Here's your information: \n")
     p_command(profile, path, inputs)
-
-
-def user_u(profile):
-    """UI function to publish/upload the bio or post online"""
-    port = 3021
-    dsuserver = profile.dsuserver
-    u_username = profile.username
-    u_password = profile.password
-    print("\nYour can upload either a post or your bio, or the both.")
-
-    answer = 'y'
-    while answer in ('y', 'Y'):
-        u_post = None
-        u_bio = None
-
-        p_answer = input("\nDo you want to upload a post? (y/n): ")
-        if p_answer in ('y', 'Y'):
-            posts = profile.get_posts()  # print all posts
-            if len(posts) == 0:
-                print("\nSorry, you don't have any post now.")
-            else:
-                try:
-                    print("\nHere's your posts: \n")
-                    for i, post in enumerate(posts):
-                        print(f"{i + 1}. {post}")
-                    post_id = (input("\nPlease enter the NUMBER of the "
-                                     "post that you want to upload: \n"))
-                    post_id = int(post_id)
-                    if post_id <= 0 or post_id > len(posts):
-                        raise IndexError
-                    post_dict = posts[post_id - 1]
-                    u_post = post_entry(post_dict)
-                except (IndexError, ValueError):
-                    print("\nSorry, you don't have a post with this number.")
-
-            if u_post is not None and (u_post == '' or u_post.isspace()):
-                print("\nSorry, the post that upload to the website "
-                      "cannot be empty or whitespace.")
-
-        b_answer = input("\nDo you want to upload your bio? (y/n): ")
-        if b_answer in ('y', 'Y'):
-            bio_answer = input("\nDo you want to upload the current bio "
-                               "or another one? (1/2)\n"
-                               "   1. upload the current bio\n"
-                               "   2. upload another bio\n")
-            if bio_answer == '1':
-                u_bio = profile.bio
-                print()
-            elif bio_answer == '2':
-                u_bio = input("\nPlease enter your bio: \n")
-                print()
-            else:
-                print("\nINVALID OPTION! Please enter a valid option.")
-            if u_bio is not None and (u_bio == '' or u_bio.isspace()):
-                print("Sorry, the bio that upload to the website "
-                      "cannot be empty or whitespace.")
-
-        if (p_answer in ['y', 'Y']) or (b_answer in ['y', 'Y']):
-            send(server=dsuserver, port=port, username=u_username,
-                 password=u_password, message=u_post, bio=u_bio)
-
-        answer = input("\nDo you want to upload another post or bio? (y/n): ")

@@ -1,39 +1,19 @@
-import urllib, json
-from urllib import request, error
+from ds_messenger import DirectMessenger
 
+ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
+                               username="nicaiwoshishei",
+                               password="buxiangshuohua")
 
-def _download_url(url_to_download: str) -> dict:
-    response = None
-    r_obj = None
+# ds_messenger2 = DirectMessenger(dsuserver="168.235.86.101",
+#                                 username="VC1",
+#                                 password="VC")
 
-    try:
-        response = urllib.request.urlopen(url_to_download)
-        json_results = response.read()
-        r_obj = json.loads(json_results)
+ds_messenger.connect()
+ds_messenger.post_online("hi")
+ds_messenger.bio_online("great!")
+# result = ds_messenger2.send(message="this is juan",
+#                             recipient="nicaiwoshishei")
+# print(result)
 
-    except urllib.error.HTTPError as e:
-        print('Failed to download contents of URL')
-        print('Status code: {}'.format(e.code))
-
-    finally:
-        if response != None:
-            response.close()
-
-    return r_obj
-
-
-def main() -> None:
-    zip = "92697"
-    ccode = "US"
-    apikey = "7cc3de7bc963865a05395ff953aa1bcf"
-    url = f"http://api.openweathermap.org/data/2.5/weather?zip={zip},{ccode}&appid={apikey}"
-
-    weather_obj = _download_url(url)
-    if weather_obj is not None:
-        # print(weather_obj['weather'][0]['description'])
-        for key, value in weather_obj.items():
-            print(key, value)
-
-
-if __name__ == '__main__':
-    main()
+# ds_messenger2.retrieve_new()
+# ds_messenger2.retrieve_all()

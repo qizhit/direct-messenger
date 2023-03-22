@@ -1,8 +1,8 @@
 """
-The main code
+The main code for running the whole program
 """
 
-# a4.py
+# a5.py
 
 # Starter code for assignment 4 in ICS 32
 # Programming with Software Libraries in Python
@@ -15,6 +15,10 @@ The main code
 
 # server = '168.235.86.101'
 # port = 3021
+# username = "nicaiwoshishei", password = "buxiangshuohua"
+# token='6e79a5fd-2b96-4c48-8ae5-938c8dbb0e54'
+# username = "IM10", password = "im10",
+# token='f5ad9862-29b1-4b6e-b654-5a45133149b6'
 
 from ui import *
 
@@ -59,12 +63,6 @@ def user():
 
                     elif ep_inputs in ('p', 'P'):
                         user_p(profile, path)
-
-                    elif ep_inputs in ('u', 'U'):
-                        try:
-                            user_u(profile)
-                        except UnboundLocalError:
-                            print('Error. No server location/IP address')
                     else:
                         print("\nINVALID OPTION! Please enter a valid option.")
 
