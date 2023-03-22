@@ -1,77 +1,36 @@
 """
-The main code for running the whole program
+a5.py
 """
-
-# a5.py
-
-# Starter code for assignment 4 in ICS 32
-# Programming with Software Libraries in Python
-
-# Replace the following placeholders with your information.
 
 # Qizhi Tian
 # qizhit@uci.edu
 # 45765950
 
-# server = '168.235.86.101'
-# port = 3021
-# username = "nicaiwoshishei", password = "buxiangshuohua"
-# token='6e79a5fd-2b96-4c48-8ae5-938c8dbb0e54'
-# username = "IM10", password = "im10",
-# token='f5ad9862-29b1-4b6e-b654-5a45133149b6'
+# 168.235.86.101
 
-from ui import *
+from ds_messenger import DirectMessenger
+from Profile import Profile
 
 
-def user():
-    """the user interface outline"""
-    print("\nWelcome!")
-    inputs = start(prompt=0)
+def store_msg(dsuserver, username, password):
+    ds_messenger = DirectMessenger(dsuserver=dsuserver,
+                                   username=username,
+                                   password=password)
+    ds_messenger.connect()
+    new_obj = ds_messenger.retrieve_new()
+    all_obj = ds_messenger.retrieve_all()
+    new_msg = []
+    all_msg = []
+    for msg in new_obj:
+        new_msg.append(msg.message)
+    for msg in all_obj:
+        all_msg.append(msg.message)
 
-    while inputs not in ('q', 'Q'):
-        if inputs in ('r', 'R'):
-            user_r()
-
-        elif inputs in ('d', 'D'):
-            user_d()
-
-        elif inputs in ('l', 'L'):
-            user_l()
-
-        elif (inputs in ('o', 'O')) or \
-                inputs in ('c', 'C'):
-            profile = Profile()
-            path = ''
-
-            if inputs in ('o', 'O'):
-                path = input("Please enter your file(.dsu) path: \n").strip()
-            elif inputs in ('c', 'C'):
-                profile, path = user_c()
-
-            load_resp = load(profile, path)
-            if load_resp is True:
-                print("\nYour file is loaded successfully!\n")
-
-                ep_inputs = start(prompt=1)
-                while True:
-                    if ep_inputs == 'back':
-                        break
-                    if ep_inputs in ('q', 'Q'):
-                        sys.exit()
-                    elif ep_inputs in ('e', 'E'):
-                        user_e(profile, path)
-
-                    elif ep_inputs in ('p', 'P'):
-                        user_p(profile, path)
-                    else:
-                        print("\nINVALID OPTION! Please enter a valid option.")
-
-                    ep_inputs = start(prompt=2)
-        else:
-            print("\nINVALID OPTION! Please enter a valid option.")
-
-        inputs = start(prompt=0)
+    profile = Profile(dsuserver=dsuserver, username=username,
+                      password=password)
+    profile.new = new_msg
+    profile.all = all_msg
 
 
 if __name__ == "__main__":
-    user()
+    store_msg("168.235.86.101", "nicaiwoshishei", "buxiangshuohua")

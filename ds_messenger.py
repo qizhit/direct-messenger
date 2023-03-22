@@ -15,12 +15,6 @@ from collections import namedtuple
 DataTuple = namedtuple('DataTuple', ['type_status', 'token', 'messages'])
 
 
-def post_entry(post_dict):
-    """collect the post that need to upload online"""
-    u_post = post_dict["entry"]
-    return u_post
-
-
 def extract_json(json_msg: str) -> DataTuple:
     """
     Call the json.loads function on a json string and
@@ -96,7 +90,6 @@ class DirectMessenger:
         directmessage = DirectMessage()
         direct_messages = []
         for mes in resp_np.messages:
-            print(mes)
             directmessage.recipient = mes['from']
             directmessage.message = mes['message']
             directmessage.timestamp = mes['timestamp']

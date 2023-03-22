@@ -16,6 +16,10 @@
 # take a look at it if you are curious since we
 # already covered a bit of the JSON format in class.
 #
+# Qizhi Tian
+# qizhit@uci.edu
+# 45765950
+
 import json
 import time
 from pathlib import Path
@@ -120,6 +124,8 @@ class Profile:
         self.password = password  # REQUIRED
         self.bio = ''            # OPTIONAL
         self._posts = []         # OPTIONAL
+        self.new = []
+        self.all = []
 
     """
 
@@ -131,6 +137,13 @@ class Profile:
     So take caution as to how you implement your add_post code.
 
     """
+    def new_msg(self, new_msg):
+        """store the new msgs received from others"""
+        self.new = new_msg
+
+    def all_msg(self, all_msg):
+        """store all msgs received from others"""
+        self.all = all_msg
 
     def add_post(self, post: Post) -> None:
         self._posts.append(post)

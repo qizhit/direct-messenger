@@ -13,29 +13,7 @@ transfer the json data of server response
 # 45765950
 
 import json
-import time
 from collections import namedtuple
-
-
-def join_profile(username, password):
-    """tranfer the profile message to server/json style"""
-    msg = {"join": {"username": username, "password": password, "token": ""}}
-    return json.dumps(msg)
-
-
-def join_post(token, message):
-    """transfer the post message to server/json style"""
-    timestamp = time.time()
-    msg = {"token": token, "post": {"entry": message, "timestamp": timestamp}}
-    return json.dumps(msg)
-
-
-def join_bio(token, bio):
-    """transfer the bio message to server/json style"""
-    timestamp = time.time()
-    msg = {"token": token, "bio": {"entry": bio, "timestamp": timestamp}}
-    return json.dumps(msg)
-
 
 # Namedtuple to hold the values retrieved from json messages.
 DataTuple = namedtuple('DataTuple', ['type_status', 'token', 'messages'])
@@ -50,7 +28,7 @@ DataTuple = namedtuple('DataTuple', ['type_status', 'token', 'messages'])
 # [{"message":"Hello", "from":"xxx", "timestamp":"1603167689.3928561"}]}}
 
 
-def extract_json(json_msg: str) -> DataTuple:
+def extract_json(json_msg: str):
     """
     Call the json.loads function on a json string and
     convert it to a DataTuple object
@@ -73,3 +51,4 @@ def extract_json(json_msg: str) -> DataTuple:
 
     except json.JSONDecodeError:
         print("Json cannot be decoded.")
+        return None
