@@ -39,5 +39,5 @@ class TestDsmessenger(unittest.TestCase):
         assert msg_np2 == extract_json(json_msg)
 
 
-# if __name__ == "__main__":
-    # unittest.main()
+if __name__ == "__main__":
+    unittest.main()

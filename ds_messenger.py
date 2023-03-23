@@ -60,6 +60,7 @@ class DirectMessenger:
     def send(self, message: str, recipient: str) -> bool:
         """return true if message successfully sent, false if send failed."""
         try:
+            self.connect()
             timestamp = time.time()
             msg = dict(token=self.token,
                        directmessage={"entry": message, "recipient": recipient,
@@ -80,6 +81,7 @@ class DirectMessenger:
 
     def retrieve_new(self) -> list:
         """return a list of DirectMessage objects containing all new msgs"""
+        self.connect()
         msg = {"token": self.token, "directmessage": "new"}
         msg = json.dumps(msg)
 
@@ -100,6 +102,7 @@ class DirectMessenger:
 
     def retrieve_all(self) -> list:
         """return a list of DirectMessage objects containing all messages"""
+        self.connect()
         msg = {"token": self.token, "directmessage": "all"}
         msg = json.dumps(msg)
 

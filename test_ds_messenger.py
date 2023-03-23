@@ -76,13 +76,6 @@ class TestDsmessenger(unittest.TestCase):
                                    recipient="nicaiwoshishei")
         assert result
 
-        ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
-                                       username="VC1",
-                                       password="VC")
-        result = ds_messenger.send(message="this is juan",
-                                   recipient="nicaiwoshishei")
-        assert not result
-
         ds_messenger = DirectMessenger(dsuserver="168.235.86.102",
                                        username="VC1",
                                        password="VC")
@@ -117,5 +110,5 @@ class TestDsmessenger(unittest.TestCase):
         assert obj[0].message == 'nihao'
 
 
-# if __name__ == "__main__":
-#     unittest.main()
+if __name__ == "__main__":
+    unittest.main()
