@@ -42,6 +42,7 @@ def extract_json(json_msg: str) -> DataTuple:
 
 
 class DirectMessage:
+    """DirectMessage Object"""
     def __init__(self):
         self.recipient = None
         self.message = None
@@ -49,6 +50,7 @@ class DirectMessage:
 
 
 class DirectMessenger:
+    """DirectMessenger: send and retrieve messages"""
     def __init__(self, dsuserver=None, username=None, password=None):
         self.token = None
         self.dsuserver = dsuserver
@@ -62,9 +64,10 @@ class DirectMessenger:
         try:
             self.connect()
             timestamp = time.time()
-            msg = dict(token=self.token,
-                       directmessage={"entry": message, "recipient": recipient,
-                                      "timestamp": timestamp})
+            msg = {"token": self.token,
+                   "directmessage": {"entry": message,
+                                     "recipient": recipient,
+                                     "timestamp": timestamp}}
             msg = json.dumps(msg)
             self.send_1.write(msg + '\r\n')
             self.send_1.flush()
@@ -97,6 +100,9 @@ class DirectMessenger:
             directmessage.message = mes['message']
             directmessage.timestamp = mes['timestamp']
             direct_messages.append(copy.deepcopy(directmessage))
+        # for i in direct_messages:
+        #     print(i.recipient)
+        #     print(i.message)
 
         return direct_messages
 
@@ -118,6 +124,10 @@ class DirectMessenger:
             directmessage.message = mes['message']
             directmessage.timestamp = mes['timestamp']
             direct_messages.append(copy.deepcopy(directmessage))
+
+        # for i in direct_messages:
+        #     print(i.recipient)
+        #     print(i.message)
 
         return direct_messages
 

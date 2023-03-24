@@ -7,10 +7,11 @@ a5_gui.py
 # 45765950
 
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, Label, Entry
 from ds_messenger import *
 from Profile import *
 from pathlib import Path
+from ttkthemes import ThemedTk
 
 
 class Body(tk.Frame):
@@ -25,25 +26,27 @@ class Body(tk.Frame):
         self._draw()
 
     def node_select(self, event):
-        index = int(self.posts_tree.selection()[0])
-        entry = self._contacts[index]
-        if self._select_callback is not None:
-            self._select_callback(entry)
+        if len(self.posts_tree.selection()) > 0:
+            index = int(self.posts_tree.selection()[0])
+            entry = self._contacts[index]
+            if self._select_callback is not None:
+                self._select_callback(entry)
 
-    def insert_contact(self, contact: str):
+    def insert_contact(self, contact):
         self._contacts.append(contact)
-        id = len(self._contacts) - 1
-        self._insert_contact_tree(id, contact)
+        i_d = len(self._contacts) - 1
+        self._insert_contact_tree(i_d, contact)
 
-    def _insert_contact_tree(self, id, contact: str):
-        if len(contact) > 25:
-            entry = contact[:24] + "..."
-        id = self.posts_tree.insert('', id, id, text=contact)
+    def _insert_contact_tree(self, i_d, contact: str):
+        # if len(contact) > 25:
+        #     entry = contact[:24] + "..."
+        # i_d = self.posts_tree.insert('', i_d, i_d, text=contact)
+        self.posts_tree.insert('', i_d, i_d, text=contact)
 
-    def insert_user_message(self, message:str):
+    def insert_user_message(self, message: str):
         self.entry_editor.insert(1.0, message + '\n', 'entry-right')
 
-    def insert_contact_message(self, message:str):
+    def insert_contact_message(self, message: str):
         self.entry_editor.insert(1.0, message + '\n', 'entry-left')
 
     def get_text_entry(self) -> str:
@@ -53,7 +56,7 @@ class Body(tk.Frame):
         self.posts_tree.delete(*self.posts_tree.get_children())
         self._contacts = []
 
-    def set_text_entry(self, text:str):
+    def set_text_entry(self, text: str):
         self.message_editor.delete(1.0, tk.END)
         self.message_editor.insert(1.0, text)
 
@@ -107,7 +110,8 @@ class Footer(tk.Frame):
             self._send_callback()
 
     def _draw(self):
-        save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
+        save_button = tk.Button(master=self, text="Send", width=20,
+                                command=self.send_click)
         # You must implement this.
         # Here you must configure the button to bind its click to
         # the send_click() function.
@@ -118,6 +122,13 @@ class Footer(tk.Frame):
 
 
 class NewContactDialog(tk.simpledialog.Dialog):
+    server_label: Label
+    server_entry: Entry
+    username_label: Label
+    username_entry: Entry
+    password_label: Label
+    password_entry: Entry
+
     def __init__(self, root, title=None, user=None, pwd=None, server=None):
         self.root = root
         self.server = server
@@ -139,7 +150,7 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.username_entry.pack()
 
         # You need to implement also the region for the user to enter
-        # the Password. The code is similar to the Username you see above
+        # the Password. The code is similar to the Username you see above,
         # but you will want to add self.password_entry['show'] = '*'
         # such that when the user types, the only thing that appears are
         # * symbols.
@@ -169,7 +180,8 @@ class MainApp(tk.Frame):
         self.profile = Profile()
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
-        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
+        self.direct_messenger = DirectMessenger(self.server, self.username,
+                                                self.password)
 
         # After all initialization is complete,
         # call the _draw method to pack the widgets
@@ -177,45 +189,51 @@ class MainApp(tk.Frame):
         self._draw()
 
     def send_message(self):
-        self.direct_messenger.send(self.body.get_text_entry(), self.recipient)
-        self.publish(self.body.get_text_entry())
-        self.check_new()
+        message = self.body.get_text_entry()
+        self.publish(message)
+        self.direct_messenger.send(message, self.recipient)
 
     def add_contact(self):
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
         # methods to add the contact to your contact list
-        name = tk.simpledialog.askstring("Add Contact", "Enter the username of the new contact")
+        name = tk.simpledialog.askstring("Add Contact",
+                                         "Enter new contact's username")
         if name is not None:
             self.body.insert_contact(name)
+            self.profile.retrieve[name] = []
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
         self.body.entry_editor.delete(1.0, tk.END)
         self.body.message_editor.delete(1.0, tk.END)
-        self.profile.load_profile(self.path)
+        # self.profile.load_profile(self.path)
         messages = self.profile.retrieve[recipient]
         for msg in messages:
             self.body.insert_contact_message(msg)
 
     def configure_server(self):
+        self.clear()
         ud = NewContactDialog(self.root, "Configure Account",
                               self.username, self.password, self.server)
         self.username = ud.user
         self.password = ud.pwd
         self.server = ud.server
-        self.direct_messenger = DirectMessenger(self.server,
-                                                self.username, self.password)
         # You must implement this!
         # You must configure and instantiate your
         # DirectMessenger instance after this line.
-        self.profile.dsuserver = self.server
-        self.profile.username = self.username
-        self.profile.password = self.password
+        self.profile = Profile(self.server, self.username, self.password)
+        self.direct_messenger = DirectMessenger(self.server,
+                                                self.username, self.password)
+
         objs = self.direct_messenger.retrieve_all()
         self.profile.init_retrieve(objs)
-        self.profile.save_profile(str(self.path))
+        friends = self.profile.retrieve.keys()
+        for friend in friends:
+            self.body.insert_contact(friend)
+        if Path(self.path).exists():
+            self.profile.save_profile(str(self.path))
 
     def publish(self, message: str):
         self.body.insert_user_message(message)
@@ -226,13 +244,43 @@ class MainApp(tk.Frame):
                                                 self.username, self.password)
         objs = self.direct_messenger.retrieve_new()
         if len(objs) > 0:
-            self.profile.load_profile(self.path)
-            self.profile.add_friend(objs)
-            self.profile.save_profile(self.path)
-            for obj in objs:
-                if obj.recipient == self.recipient:
-                    self.body.insert_contact_message(obj.message)
+            new_friend = self.profile.add_friend(objs)
+            for friend in new_friend:
+                self.body.insert_contact(friend)
+        if Path(self.path).exists():
+            self.profile.save_profile(str(self.path))
         self.after(1000, self.check_new)
+
+    def new_button(self):
+        self.clear()
+        file_path = filedialog.asksaveasfilename(defaultextension='.dsu')
+        self.path = file_path
+        Path(file_path).touch()
+        self.configure_server()
+        self.check_new()
+
+    def open_button(self):
+        self.clear()
+        file_path = filedialog.askopenfilename()
+        self.path = file_path
+
+        if file_path:
+            self.profile.load_profile(str(file_path))
+            self.username = self.profile.username
+            self.password = self.profile.password
+            self.server = self.profile.dsuserver
+            friends = self.profile.retrieve.keys()
+            for friend in friends:
+                self.body.insert_contact(friend)
+        self.check_new()
+
+    def close_button(self):
+        self.root.destroy()
+
+    def clear(self):
+        self.body.delete_all_contacts()
+        self.body.entry_editor.delete(1.0, tk.END)
+        self.body.message_editor.delete(1.0, tk.END)
 
     def _draw(self):
         # Build a menu and add it to the root frame.
@@ -241,9 +289,9 @@ class MainApp(tk.Frame):
         menu_file = tk.Menu(menu_bar)
 
         menu_bar.add_cascade(menu=menu_file, label='File')
-        menu_file.add_command(label='New', command=self.create_file)
-        menu_file.add_command(label='Open...', command=self.open_file)
-        menu_file.add_command(label='Close', command=self.close_file)
+        menu_file.add_command(label='New', command=self.new_button)
+        menu_file.add_command(label='Open...', command=self.open_button)
+        menu_file.add_command(label='Close', command=self.close_button)
 
         settings_file = tk.Menu(menu_bar)
         menu_bar.add_cascade(menu=settings_file, label='Settings')
@@ -260,55 +308,12 @@ class MainApp(tk.Frame):
         self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
-    def open_file(self):
-        file_path = filedialog.askopenfilename()
-        self.path = file_path
-        self.profile.load_profile(str(file_path))
-        self.username = self.profile.username
-        self.password = self.profile.password
-        self.server = self.profile.dsuserver
-        self.direct_messenger = DirectMessenger(self.server,
-                                                self.username, self.password)
-        if file_path:
-            self.profile.load_profile(file_path)
-            friends = self.profile.retrieve.keys()
-            for friend in friends:
-                self.body.insert_contact(friend)
-        self.check_new()
-
-    def create_file(self):
-        file_path = filedialog.asksaveasfilename(defaultextension='.dsu')
-        self.path = file_path
-        Path(file_path).touch()
-        self.configure_server()
-        self.profile.save_profile(file_path)
-        self.profile.dsuserver = self.server
-        self.profile.username = self.username
-        self.profile.password = self.password
-        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
-        self.profile.load_profile(file_path)
-        self.profile.save_profile(file_path)
-        friends = self.profile.retrieve.keys()
-        for friend in friends:
-            self.body.insert_contact(friend)
-        self.check_new()
-
-    def close_file(self):
-        self.body.delete_all_contacts()
-        self.body.entry_editor.delete(1.0, tk.END)
-        self.body.message_editor.delete(1.0, tk.END)
-        self.path = ''
-        self.server = ''
-        self.username = ''
-        self.password = ''
-        self.recipient = ''
-        self.profile = Profile()
-        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
-
 
 if __name__ == "__main__":
+    # 168.235.86.101
     # All Tkinter programs start with a root window. We will name ours 'main'.
-    main = tk.Tk()
+    main = ThemedTk(theme="radiance")
+    # main.set_theme('itft1f')
 
     # 'title' assigns a text value to the Title Bar area of a window.
     main.title("ICS 32 Distributed Social Messenger")
@@ -323,7 +328,7 @@ if __name__ == "__main__":
     main.option_add('*tearOff', False)
 
     # Initialize the MainApp class, which is the starting point for the
-    # widgets used in the program. All of the classes that we use,
+    # widgets used in the program. All the classes that we use,
     # subclass Tk.Frame, since our root frame is main, we initialize
     # the class with it.
     app = MainApp(main)

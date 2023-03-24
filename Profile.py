@@ -94,10 +94,13 @@ class Profile:
             self.retrieve[obj.recipient].append(obj.message)
 
     def add_friend(self, direct_obj):
+        new_friend = []
         for obj in direct_obj:
             if obj.recipient not in self.retrieve.keys():
                 self.retrieve[obj.recipient] = []
+                new_friend.append(obj.recipient)
             self.retrieve[obj.recipient].append(obj.message)
+        return new_friend
 
     """
 
@@ -149,7 +152,7 @@ class Profile:
                 self.username = obj['username']
                 self.password = obj['password']
                 self.dsuserver = obj['dsuserver']
-                # self.retrieve = obj['retrieve']
+                self.retrieve = obj['retrieve']
                 f.close()
             except Exception as ex:
                 raise DsuProfileError(ex)
