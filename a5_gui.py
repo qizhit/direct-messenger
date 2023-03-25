@@ -282,7 +282,6 @@ class MainApp(tk.Frame):
                     self.body.insert_contact_message(obj.message)
                 if Path(self.path).exists():
                     self.profile.load_profile(self.path)
-                    print(self.path)
                     self.profile.add_friend(objs)
                     self.profile.save_profile(self.path)
         self.after(1000, self.check_new)
