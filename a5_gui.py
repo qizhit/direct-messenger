@@ -202,16 +202,18 @@ class MainApp(tk.Frame):
                                          "Enter new contact's username")
         if name is not None:
             self.body.insert_contact(name)
-            self.profile.retrieve[name] = []
+            if name not in self.profile.retrieve.keys():
+                self.profile.retrieve[name] = []
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
         self.body.entry_editor.delete(1.0, tk.END)
         self.body.message_editor.delete(1.0, tk.END)
-        # self.profile.load_profile(self.path)
-        messages = self.profile.retrieve[recipient]
-        for msg in messages:
-            self.body.insert_contact_message(msg)
+        self.profile.load_profile(self.path)
+        if len(self.profile.retrieve[recipient]) > 0:
+            messages = self.profile.retrieve[recipient]
+            for msg in messages:
+                self.body.insert_contact_message(msg)
 
     def configure_server(self):
         self.clear()
@@ -239,23 +241,42 @@ class MainApp(tk.Frame):
         self.body.insert_user_message(message)
         self.body.message_editor.delete(1.0, tk.END)
 
+    # def check_new(self):
+    #     self.profile.load_profile(str(self.path))
+    #     self.direct_messenger = DirectMessenger(self.server,
+    #                                             self.username, self.password)
+    #     objs = self.direct_messenger.retrieve_new()
+    #     if len(objs) > 0:
+    #         new_friend = self.profile.add_friend(objs)
+    #         for friend in new_friend:
+    #             self.body.insert_contact(friend)
+    #             if friend == self.recipient:
+    #                 self.body.insert_contact_message(
+    #                     self.profile.retrieve[friend])
+    #     if Path(self.path).exists():
+    #         self.profile.save_profile(str(self.path))
+    #     self.after(1000, self.check_new)
+
     def check_new(self):
-        self.direct_messenger = DirectMessenger(self.server,
-                                                self.username, self.password)
+        self.direct_messenger = DirectMessenger(self.server, self.username,
+                                                self.password)
         objs = self.direct_messenger.retrieve_new()
         if len(objs) > 0:
-            new_friend = self.profile.add_friend(objs)
-            for friend in new_friend:
-                self.body.insert_contact(friend)
-        if Path(self.path).exists():
-            self.profile.save_profile(str(self.path))
+            for obj in objs:
+                if obj.recipient == self.recipient:
+                    self.body.insert_contact_message(obj.message)
+                elif obj.recipient != self.recipient:
+                    self.body.insert_contact(obj.recipient)
+                self.profile.load_profile(self.path)
+                self.profile.add_friend(objs)
+                self.profile.save_profile(self.path)
         self.after(1000, self.check_new)
 
     def new_button(self):
         self.clear()
         file_path = filedialog.asksaveasfilename(defaultextension='.dsu')
         self.path = file_path
-        Path(file_path).touch()
+        Path(self.path).touch()
         self.configure_server()
         self.check_new()
 
@@ -264,8 +285,8 @@ class MainApp(tk.Frame):
         file_path = filedialog.askopenfilename()
         self.path = file_path
 
-        if file_path:
-            self.profile.load_profile(str(file_path))
+        if self.path:
+            self.profile.load_profile(str(self.path))
             self.username = self.profile.username
             self.password = self.profile.password
             self.server = self.profile.dsuserver
