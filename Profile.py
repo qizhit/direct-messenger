@@ -1,3 +1,4 @@
+"""Profile.py"""
 # Profile.py
 #
 # ICS 32
@@ -21,31 +22,31 @@
 # 45765950
 
 import json
-import time
 from pathlib import Path
 
-
-"""
-DsuFileError is a custom exception handler that you should
-catch in your own code. It is raised when attempting to
-load or save Profile objects to file the system.
-
-"""
+# """
+# DsuFileError is a custom exception handler that you should
+# catch in your own code. It is raised when attempting to
+# load or save Profile objects to file the system.
+#
+# """
 
 
 class DsuFileError(Exception):
+    """DsuFileError"""
     pass
 
 
-"""
-DsuProfileError is a custom exception handler that you should
-catch in your own code. It is raised when attempting to
-deserialize a dsu file to a Profile object.
-
-"""
+# """
+# DsuProfileError is a custom exception handler that you should
+# catch in your own code. It is raised when attempting to
+# deserialize a dsu file to a Profile object.
+#
+# """
 
 
 class DsuProfileError(Exception):
+    """DsuProfileError"""
     pass
 
 
@@ -71,22 +72,24 @@ class Profile:
     """
 
     def __init__(self, dsuserver=None, username=None, password=None):
+        """__init__"""
         self.dsuserver = dsuserver  # REQUIRED
         self.username = username  # REQUIRED
         self.password = password  # REQUIRED
         self.retrieve = {}
 
-    """
-
-    add_post accepts a Post object as parameter and appends it
-    to the posts list. Posts are stored in a list object
-    in the order they are added. So if multiple Posts objects are created,
-    but added to the Profile in a different order, it is possible for the
-    list to not be sorted by the Post.timestamp property.
-    So take caution as to how you implement your add_post code.
-
-    """
+    # """
+    #
+    # add_post accepts a Post object as parameter and appends it
+    # to the posts list. Posts are stored in a list object
+    # in the order they are added. So if multiple Posts objects are created,
+    # but added to the Profile in a different order, it is possible for the
+    # list to not be sorted by the Post.timestamp property.
+    # So take caution as to how you implement your add_post code.
+    #
+    # """
     def init_retrieve(self, direct_obj):
+        """init_retrieve"""
         self.retrieve = {}
         for obj in direct_obj:
             if obj.recipient not in self.retrieve.keys():
@@ -94,6 +97,7 @@ class Profile:
             self.retrieve[obj.recipient].append(obj.message)
 
     def add_friend(self, direct_obj):
+        """add_friend"""
         new_friend = []
         for obj in direct_obj:
             if obj.recipient not in self.retrieve.keys():
@@ -102,59 +106,59 @@ class Profile:
             self.retrieve[obj.recipient].append(obj.message)
         return new_friend
 
-    """
-
-    save_profile accepts an existing dsu file to
-    save the current instance of Profile to the file system.
-
-    Example usage:
-
-    profile = Profile()
-    profile.save_profile('/path/to/file.dsu')
-
-    Raises DsuFileError
-
-    """
+    # """
+    #
+    # save_profile accepts an existing dsu file to
+    # save the current instance of Profile to the file system.
+    #
+    # Example usage:
+    #
+    # profile = Profile()
+    # profile.save_profile('/path/to/file.dsu')
+    #
+    # Raises DsuFileError
+    #
+    # """
     def save_profile(self, path: str) -> None:
-        p = Path(path)
+        """save_profile"""
+        path = Path(path)
 
-        if p.exists() and p.suffix == '.dsu':
+        if path.exists() and path.suffix == '.dsu':
             try:
-                f = open(p, 'w')
-                json.dump(self.__dict__, f)
-                f.close()
-            except Exception as ex:
+                with open(path, 'w', encoding='utf-8') as file:
+                    json.dump(self.__dict__, file)
+            except Exception as exc:
                 raise DsuFileError("Error while attempting "
-                                   "to process the DSU file.", ex)
+                                   "to process the DSU file.") from exc
         else:
             raise DsuFileError("Invalid DSU file path or type")
 
-    """
-
-    load_profile will populate the current instance of Profile
-    with data stored in a DSU file.
-
-    Example usage:
-
-    profile = Profile()
-    profile.load_profile('/path/to/file.dsu')
-
-    Raises DsuProfileError, DsuFileError
-
-    """
+    # """
+    #
+    # load_profile will populate the current instance of Profile
+    # with data stored in a DSU file.
+    #
+    # Example usage:
+    #
+    # profile = Profile()
+    # profile.load_profile('/path/to/file.dsu')
+    #
+    # Raises DsuProfileError, DsuFileError
+    #
+    # """
     def load_profile(self, path: str) -> None:
-        p = Path(path)
+        """load_profile"""
+        path = Path(path)
 
-        if p.exists() and p.suffix == '.dsu':
+        if path.exists() and path.suffix == '.dsu':
             try:
-                f = open(p, 'r')
-                obj = json.load(f)
-                self.username = obj['username']
-                self.password = obj['password']
-                self.dsuserver = obj['dsuserver']
-                self.retrieve = obj['retrieve']
-                f.close()
-            except Exception as ex:
-                raise DsuProfileError(ex)
+                with open(path, 'r', encoding='utf-8') as file:
+                    obj = json.load(file)
+                    self.username = obj['username']
+                    self.password = obj['password']
+                    self.dsuserver = obj['dsuserver']
+                    self.retrieve = obj['retrieve']
+            except Exception as exc:
+                raise DsuProfileError() from exc
         else:
             raise DsuFileError()

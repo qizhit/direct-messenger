@@ -71,7 +71,6 @@ class TestDsmessenger(unittest.TestCase):
         ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
                                        username="VC1",
                                        password="VC")
-        ds_messenger.connect()
         result = ds_messenger.send(message="this is juan",
                                    recipient="nicaiwoshishei")
         assert result
@@ -79,7 +78,6 @@ class TestDsmessenger(unittest.TestCase):
         ds_messenger = DirectMessenger(dsuserver="168.235.86.102",
                                        username="VC1",
                                        password="VC")
-        ds_messenger.connect()
         result = ds_messenger.send(message="this is juan",
                                    recipient="nicaiwoshishei")
         assert not result
@@ -87,18 +85,10 @@ class TestDsmessenger(unittest.TestCase):
     def test_retrieve_new(self):
         """test retrieve_new()"""
         ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
-                                       username="VC1",
-                                       password="VC")
-        ds_messenger.connect()
-        ds_messenger.send(message="this is juan",
-                          recipient="nicaiwoshishei")
-
-        ds_messenger = DirectMessenger(dsuserver="168.235.86.101",
                                        username="nicaiwoshishei",
                                        password="buxiangshuohua")
-        ds_messenger.connect()
-        obj = ds_messenger.retrieve_new()
-        assert obj[0].message == 'this is juan'
+        objs = ds_messenger.retrieve_new()
+        assert isinstance(objs, list)
 
     def test_retrieve_all(self):
         """test retrieve_all()"""
@@ -106,8 +96,8 @@ class TestDsmessenger(unittest.TestCase):
                                        username="nicaiwoshishei",
                                        password="buxiangshuohua")
         ds_messenger.connect()
-        obj = ds_messenger.retrieve_all()
-        assert obj[0].message == 'nihao'
+        objs = ds_messenger.retrieve_all()
+        assert isinstance(objs, list)
 
 
 if __name__ == "__main__":

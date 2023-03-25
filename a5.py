@@ -7,20 +7,15 @@ a5.py
 # 45765950
 
 # 168.235.86.101
-# add contact 发消息
-# 接收新contact
-# try except
 
 import tkinter as tk
 from a5_gui import MainApp
-from ttkthemes import ThemedTk
-
 
 if __name__ == "__main__":
     if __name__ == "__main__":
         # All Tkinter programs start with a root window.
         # We will name ours 'main'.
-        main = ThemedTk(theme="radiance")
+        main = tk.Tk()
 
         # 'title' assigns a text value to the Title Bar area of a window.
         main.title("ICS 32 Distributed Social Messenger")
