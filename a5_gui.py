@@ -275,15 +275,16 @@ class MainApp(tk.Frame):
         objs = self.direct_messenger.retrieve_new()
         if len(objs) > 0:
             for obj in objs:
-                if Path(self.path).exists():
-                    self.profile.load_profile(self.path)
-                    self.profile.add_friend(objs)
-                    self.profile.save_profile(self.path)
                 if obj.recipient == self.recipient:
                     self.body.insert_contact_message(obj.message)
                 elif obj.recipient != self.recipient:
                     self.body.insert_contact(obj.recipient)
                     self.body.insert_contact_message(obj.message)
+                if Path(self.path).exists():
+                    self.profile.load_profile(self.path)
+                    print(self.path)
+                    self.profile.add_friend(objs)
+                    self.profile.save_profile(self.path)
         self.after(1000, self.check_new)
 
     def new_button(self):
@@ -293,6 +294,7 @@ class MainApp(tk.Frame):
         self.path = file_path
         Path(self.path).touch()
         self.configure_server()
+        self.profile.save_profile(self.path)
         self.check_new()
 
     def open_button(self):
@@ -352,3 +354,42 @@ class MainApp(tk.Frame):
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
         self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
+
+
+if __name__ == "__main__":
+    # All Tkinter programs start with a root window.
+    # We will name ours 'main'.
+    main = tk.Tk()
+
+    # 'title' assigns a text value to the Title Bar area of a window.
+    main.title("ICS 32 Distributed Social Messenger")
+
+    # This is just an arbitrary starting point. You can change the value
+    # around to see how the starting size of the window changes.
+    main.geometry("720x480")
+
+    # adding this option removes some legacy behavior with menus that
+    # some modern OSes don't support. If you're curious,
+    # feel free to comment out and see how the menu changes.
+    main.option_add('*tearOff', False)
+
+    # Initialize the MainApp class, which is the starting point for the
+    # widgets used in the program. All of the classes that we use,
+    # subclass Tk.Frame, since our root frame is main, we initialize
+    # the class with it.
+    app = MainApp(main)
+
+    # When update is called, we finalize the states of all widgets that
+    # have been configured within the root frame. Here, update ensures that
+    # we get an accurate width and height
+    # reading based on the types of widgets we have used.
+    # minsize prevents the root window from resizing too small.
+    # Feel free to comment it out and see how the resizing
+    # behavior of the window changes.
+    main.update()
+    main.minsize(main.winfo_width(), main.winfo_height())
+    id_ = main.after(2000, app.check_new)
+    print(id_)
+    # And finally, start up the event loop for the program (you can find
+    # more on this in lectures of week 9 and 10).
+    main.mainloop()
